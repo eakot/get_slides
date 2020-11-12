@@ -1,6 +1,8 @@
 #install firefox
 #setup userChrome.css file
 
+brew install mupdf-tools  # crop pdf on halfs
+
 #install djvu2pdf + ocrmypdf + languages pack
 #ocr files custom script
 
