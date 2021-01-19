@@ -1,5 +1,5 @@
 
-#cope this file to home dir and add this in ~/.bashrc
+#copy this file to home dir and add this in ~/.bashrc
 #if [ -e $HOME/.bash_aliases ]; then
 #    source $HOME/.bash_aliases
 #fi
