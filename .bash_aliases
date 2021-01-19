@@ -88,4 +88,5 @@ function cl() {
         ls -F --color=auto
 }
 
-
+# tar
+alias tar='tar -zxvf'
