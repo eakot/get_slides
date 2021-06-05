@@ -1,0 +1,35 @@
+/* Hide .twisty and adjust margins so favicons have 7px on left. */
+.tab .twisty {
+	margin-left: 2px;
+}
+
+/* Push tab labels slightly to the right so they're completely hidden in collapsed state */
+.tab .label {
+	margin-left: 9px;
+}
+
+/* Dark Theme */
+
+:root, #background {
+  background: #222;
+}
+
+.tab * {
+  color: #fff;
+  font-size: 16px
+}
+
+.tab {
+  height: 40px;
+  border-bottom: 0.5px solid #5A5A5C;
+  background: #333;
+}
+
+.tab:not(.active):hover,
+.after-tabs button:hover {
+  background: #5C5C61;
+}
+
+.tab.active{
+  background: #7f7f7f;
+}
