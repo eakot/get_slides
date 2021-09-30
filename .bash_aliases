@@ -77,7 +77,7 @@ alias top='atop'
 
 
 # Change directories and view the contents at the same time
-function cl() {
+function cd() {
     DIR="$*";
         # if no DIR given, go home
         if [ $# -lt 1 ]; then
