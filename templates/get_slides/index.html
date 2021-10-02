@@ -1,0 +1,16 @@
+{% extends 'get_slides/base.html' %}
+
+{% block content %}
+
+<div  class="form-signin">
+    <h2 class="title">Slides from video</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label for="urlInput" class="form-label">Youtube URL</label>
+            <input type="text" class="form-control" id="urlInput" name="urlInput">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+{% endblock %}
