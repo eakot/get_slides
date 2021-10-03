@@ -3,41 +3,43 @@
 {% block content %}
 
 
-<section class="container">
-    <h2 class="title">Uploaded</h2>
-    <a>{{url}}</a>
-    <h2>Slides</h2>
-    <div class="album py-5">
-        <div class="container">
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                {% for slide, text in slides_with_text.items() %}
+    <section class="container">
+        <h2 class="title">Uploaded</h2>
+        <a>{{ url }}</a>
+        <h2>youtube_info</h2>
+        {{ youtube_info }}
+        <h2>Slides</h2>
+        <div class="album py-5">
+            <div class="container">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                    {% for slide, text in slides_with_text.items() %}
 
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <img class="card-img-top border-bottom"
-                             src=/{{slide}}
-                             alt={{text}}>
+                        <div class="col">
+                            <div class="card shadow-sm">
+                                <img class="card-img-top border-bottom"
+                                     src=/{{ slide }}
+                                     alt={{ text }}>
 
-                        <div class="card-body">
-                            <p class="card-text " style="white-space: pre-line">{{text}}</p>
+                                <div class="card-body">
+                                    <p class="card-text " style="white-space: pre-line">{{ text }}</p>
 
 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">01:01</small>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">01:01</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
         </div>
-    </div>
 
 
-    <h5>frames_text_dict:</h5>
-    {% for i in frames_text_dict %}
-    <p> {{i[0]}}: {{i[1]}}</p>
-    {% endfor %}
+        <h5>frames_text_dict:</h5>
+        {% for i in frames_text_dict %}
+            <p> {{ i[0] }}: {{ i[1] }}</p>
+        {% endfor %}
 
-</section>
+    </section>
 {% endblock %}

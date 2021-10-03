@@ -2,12 +2,19 @@ from flask import Flask
 from flask import render_template, send_file, request, redirect, url_for
 
 from src.Video import Video
+from src.db.db_init import create_all
 from src.utils import *
 import pandas as pd
+from sqlalchemy import create_engine
+
+engine = create_engine('postgresql://postgres:postgres@db:5432/postgres')
+create_all(engine)
 
 app = Flask(__name__)
 
-video_directory = "tmp"
+video_directory = "static/videos/"
+
+
 @app.route('/get_slides/')
 def index():
     return render_template('get_slides/index.html')
@@ -16,7 +23,7 @@ def index():
 @app.route('/get_slides/', methods=['POST', 'GET'])
 def index_upload():
     url = request.form['urlInput']
-    video = Video(url, video_directory)
+    video = Video(engine, url, video_directory)
 
     frames_text_pairs = [[frame, ocr_image(frame)] for frame in video.frames_filenames]
 
@@ -26,14 +33,14 @@ def index_upload():
 
     slides = sorted(set(video.frames_filenames) - set(duplicates))
 
-    frames_text_dict = {i[0]: i[1] for i in frames_text_pairs }
+    frames_text_dict = {i[0]: i[1] for i in frames_text_pairs}
     slides_with_text = {slide: frames_text_dict[slide] for slide in slides}
     return render_template('get_slides/uploaded.html',
                            url=video.url,
                            filename=video.filename,
+                           youtube_info=video.youtube_info,
                            frames_text_dict=frames_text_dict,
                            slides_with_text=slides_with_text)
-
 
 
 @app.route("/")
