@@ -1,11 +1,13 @@
 from flask import Flask
 from flask import render_template, send_file, request, redirect, url_for
+
+from src.Video import Video
 from src.utils import *
 import pandas as pd
 
 app = Flask(__name__)
 
-
+video_directory = "tmp"
 @app.route('/get_slides/')
 def index():
     return render_template('get_slides/index.html')
@@ -14,18 +16,15 @@ def index():
 @app.route('/get_slides/', methods=['POST', 'GET'])
 def index_upload():
     url = request.form['urlInput']
-    filename = generate_name_from_url(url)
-    load_youtube_video(url, filename)
+    video = Video(url)
 
-    frames_filenames = get_frames(filename)
-
-    frames_text_pairs = [[image, ocr_image(image)] for image in frames_filenames]
+    frames_text_pairs = [[frame, ocr_image(frame)] for frame in video.frames_filenames]
 
     frames_text_df = pd.DataFrame(frames_text_pairs, columns=["image", "text"])
 
     duplicates = remove_duplicates_from_disk(frames_text_df)
 
-    slides = sorted(set(frames_filenames) - set(duplicates))
+    slides = sorted(set(video.frames_filenames) - set(duplicates))
 
     frames_text_dict = {i[0]: i[1] for i in frames_text_pairs }
     slides_with_text = {slide: frames_text_dict[slide] for slide in slides}

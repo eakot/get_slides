@@ -2,13 +2,14 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
-eakotelnikov_url='http://37.139.43.86/'
-alias bashrc_update='curl {$eakotelnikov_url}/.bashrc > ~/.bashrc'
+export eakotelnikov_url='http://37.139.43.86/'
+alias bashrc_update='curl $eakotelnikov_url/.bashrc > ~/.bashrc'
 
 blog_server_tag='flask-blog:latest'
-alias build_server='sudo docker build -t $blog_server_tag ~/httpserver/'
+alias build_server='sudo docker build -t $blog_server_tag ./'
 alias stop_server='sudo docker stop $(sudo docker ps -q )'
-alias run_server='sudo docker run -d -p 80:80 -v /home/kotelnikov/httpserver:/usr/src/app $blog_server_tag'
+alias run_server='sudo docker run -d -p 80:80 -v /home/kotelnikov/get_slides:/usr/src/app $blog_server_tag'
+alias run_server_mac='sudo docker run -d -p 80:80 -v /Users/kotelnikov/Documents/projects/get_slides:/usr/src/app $blog_server_tag'
 
 ####  ls  ####
 #sort by file size
