@@ -7,7 +7,6 @@ from sqlalchemy import create_engine
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-from .get_slides import detect_unique_screenshots, initialize_output_folder
 from .utils import *
 from loguru import logger
 import logging
@@ -108,14 +107,6 @@ class Video(db.Model):
         video.download(output_path=self.directory, filename=self.filename)
 
         return None
-
-    def save_unique_frames(self):
-        video_path = os.path.join(self.directory, self.filename)
-        frames_dir = f"static/images/{self.video_id}"
-        initialize_output_folder(video_path, frames_dir)
-        frames_filenames = detect_unique_screenshots(video_path,
-                                                     frames_dir)
-        return frames_filenames
 
     def save_frames(self):
         images_dir = generate_dir(self.filename)
