@@ -9,11 +9,11 @@ from src.utils import generate_name_from_url, generate_dir
 
 
 class Video:
-    def __init__(self, url):
+    def __init__(self, url, video_directory):
         self.url = url
         self.filename = generate_name_from_url(url)
         self.download(self.url, self.filename)
-        self.frames_filenames = self.save_frames()
+        self.frames_filenames = self.save_frames(video_directory)
 
     def download(self, url, directory):
         video = YouTube(url).streams \
