@@ -1,2 +1,6 @@
 # setup
-Install software and change settings in workstation
+Create the tables:
+sudo docker-compose exec web python3 -m src.db_init create_db
+
+
+
