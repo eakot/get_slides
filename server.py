@@ -16,7 +16,7 @@ def index():
 @app.route('/get_slides/', methods=['POST', 'GET'])
 def index_upload():
     url = request.form['urlInput']
-    video = Video(url)
+    video = Video(url, video_directory)
 
     frames_text_pairs = [[frame, ocr_image(frame)] for frame in video.frames_filenames]
 
@@ -29,8 +29,8 @@ def index_upload():
     frames_text_dict = {i[0]: i[1] for i in frames_text_pairs }
     slides_with_text = {slide: frames_text_dict[slide] for slide in slides}
     return render_template('get_slides/uploaded.html',
-                           url=url,
-                           filename=filename,
+                           url=video.url,
+                           filename=video.filename,
                            frames_text_dict=frames_text_dict,
                            slides_with_text=slides_with_text)
 
