@@ -2,15 +2,41 @@
 
 {% block content %}
 
-<div  class="form-signin">
     <h2 class="title">Slides from video</h2>
-    <form method="post">
-        <div class="mb-3">
+
+    <style>
+        .myForm {
+            min-width: 100%;
+            position: absolute;
+            text-align: center;
+            top: 38%;
+            left: 0;
+            transform: translate(0, -38%);
+        }
+
+        @media (max-width: 500px) {
+            .myForm {
+                min-width: 90%;
+                width: 90%;
+            }
+
+        }
+    </style>
+    <div class="myForm">
+        <div class="form-signin d-flex justify-content-center mb-6 ">
+
+        <form method="post">
             <label for="urlInput" class="form-label">Youtube URL</label>
             <input type="text" class="form-control" id="urlInput" name="urlInput">
+            <p></p>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-</div>
-https://www.youtube.com/watch?v=y6gTsj6okHE
+    </div>
+    <a href=https://www.youtube.com/watch?v=y6gTsj6okHE>https://www.youtube.com/watch?v=y6gTsj6okHE</a>
+
+    <br>
+    {{ error|safe }}
+
 {% endblock %}
