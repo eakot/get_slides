@@ -13,6 +13,8 @@ try:
 except ImportError:
     import Image
 
+from flask_sqlalchemy import SQLAlchemy
+
 
 def clear_text(t: str) -> str:
     regex = re.compile('[^a-zA-Zа-яА-ЯеЁ]')
@@ -32,34 +34,37 @@ def similar(a, b):
 
 
 def remove_duplicates_or_empty(frames_text_list):
-    regex = re.compile('[\s+]')
     to_delete = []
-    text_prev = frames_text_list[0][1]
-    if len(regex.sub('', text_prev)) == 0:
-        to_delete.append(frames_text_list[0][0])
 
-    for i in range(1, len(frames_text_list)):
-        image = frames_text_list[i][0]
-        text = frames_text_list[i][1]
+    if len(frames_text_list) > 0:
+        regex = re.compile('[\s+]')
+        text_prev = frames_text_list[0][1]
+        if len(regex.sub('', text_prev)) == 0:
+            to_delete.append(frames_text_list[0][0])
 
-        if len(regex.sub('', text)) == 0:
-            to_delete.append(image)
-        else:
-            sim = similar(text_prev, text)
-            logger.info(f"i = {i}, sim = {sim}")
-            if sim > 0.8:
+        for i in range(1, len(frames_text_list)):
+            image = frames_text_list[i][0]
+            text = frames_text_list[i][1]
+
+            if len(regex.sub('', text)) == 0:
                 to_delete.append(image)
             else:
-                text_prev = text
+                sim = similar(text_prev, text)
+                logger.info(f"i = {i}, sim = {sim}")
+                if sim > 0.8:
+                    to_delete.append(image)
+                else:
+                    text_prev = text
 
-    logger.info(f"duplicates: {to_delete}")
-    for f in to_delete:
-        os.remove(f)
+        logger.info(f"duplicates: {to_delete}")
+        for f in to_delete:
+            os.remove(f)
 
     return to_delete
 
 
 def ocr_image(filename):
+    logger.info(f"ocr_image( {filename} )")
     image = cv2.imread(filename)
 
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -79,14 +84,6 @@ def ocr_image(filename):
     text = re.compile(r"[^a-zA-Z0-9-\n]+").sub(" ", text)
 
     return text
-
-
-def generate_name_from_url(url):
-    return
-
-
-def generate_dir(filename):
-    return f'static/images/{"_".join(filename.split(".")[:-1])}'
 
 
 if __name__ == '__main__':
