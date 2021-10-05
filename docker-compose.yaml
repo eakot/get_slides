@@ -19,7 +19,7 @@ services:
       - FLASK_ENV=development
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     volumes:
-      - /Users/kotelnikov/Documents/projects/get_slides:/usr/src/app
+      - ./:/usr/src/app
     ports:
       - "80:80"
     depends_on:
