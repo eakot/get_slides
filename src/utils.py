@@ -6,54 +6,57 @@ import numpy as np
 import pytesseract
 import fire
 from loguru import logger
+from difflib import SequenceMatcher
+
 try:
     from PIL import Image
 except ImportError:
     import Image
 
-from difflib import SequenceMatcher
 
+def clear_text(t: str) -> str:
+    regex = re.compile('[^a-zA-Zа-яА-ЯеЁ]')
+    t = regex.sub(' ', t)
+    words = sorted(t.lower().split())
+    return ' '.join(w for w in words if len(w) > 4)
 
-def images_ocr_similar(a, b):
-    text_a = ocr_image(a)
-    text_b = ocr_image(b)
-
-    print(text_a)
-    print(text_b)
-    return similar(a, b)
 
 def similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()
+    clear_a = clear_text(a)
+    clear_b = clear_text(b)
+    logger.debug(f"clear_a: {clear_a}")
+    logger.debug(f"clear_b: {clear_b}")
+    sim = SequenceMatcher(None, clear_a, clear_b).ratio()
+    logger.debug(f"sim: {sim}")
+    return sim
 
 
-def remove_duplicates(frames_text_list):
-    duplicates = []
+def remove_duplicates_or_empty(frames_text_list):
+    regex = re.compile('[\s+]')
+    to_delete = []
     text_prev = frames_text_list[0][1]
+    if len(regex.sub('', text_prev)) == 0:
+        to_delete.append(frames_text_list[0][0])
+
     for i in range(1, len(frames_text_list)):
         image = frames_text_list[i][0]
         text = frames_text_list[i][1]
-        sim = similar(text_prev, text)
-        logger.info(f"i = {i}, sim = {sim}")
-        if sim > 0.8:
-            duplicates.append(image)
+
+        if len(regex.sub('', text)) == 0:
+            to_delete.append(image)
         else:
-            text_prev = text
+            sim = similar(text_prev, text)
+            logger.info(f"i = {i}, sim = {sim}")
+            if sim > 0.8:
+                to_delete.append(image)
+            else:
+                text_prev = text
 
-    logger.info(f"duplicates: {duplicates}")
-    for duplicated_frame in duplicates:
-        os.remove(duplicated_frame)
+    logger.info(f"duplicates: {to_delete}")
+    for f in to_delete:
+        os.remove(f)
 
-    return duplicates
-
-
-def remove_duplicates_from_disk(frames_text_df):
-    duplicates = frames_text_df["image"][frames_text_df.duplicated("text")] \
-        .to_list()
-
-    for duplicated_frame in duplicates:
-        os.remove(duplicated_frame)
-
-    return duplicates
+    return to_delete
 
 
 def ocr_image(filename):
@@ -69,7 +72,7 @@ def ocr_image(filename):
     # image = cv2.Canny(image, 100, 200)
 
     text = pytesseract \
-        .image_to_string(image, lang='eng')
+        .image_to_string(image, lang='eng', config='--psm 4')
 
     text = "\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
 
