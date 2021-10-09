@@ -1,13 +1,13 @@
-{% extends 'get_slides/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 
 
     <section class="container">
-        <h2>Slides</h2>
+
         <div class="album py-5">
             <div class="container">
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                <div class="row row-cols-1 g-3">
                     {% for slide, text in slides_with_text.items() %}
                         <div class="col">
                             <div class="card shadow-sm">
@@ -15,7 +15,7 @@
                                      src=/{{ slide }}
                                      alt={{ text }}>
 
-                                <div class="card-body text-truncate" style="max-height: 400px">
+                                <div class="card-body text-truncate d-none" style="max-height: 300px">
                                     <p class="card-text" style="white-space: pre-line">{{ text }}</p>
 
                                     <div class="d-flex justify-content-between align-items-center">

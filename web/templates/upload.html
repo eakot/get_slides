@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+
+    <div class="mb-4 ">
+
+            <form method="post">
+                <label for="urlInput" class="form-label">Youtube URL</label>
+                <input type="text" class="form-control mb-2" id="urlInput" name="urlInput">
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <label for="reloadFrames">reload frames</label>
+                <input type="checkbox" id="reloadFrames" name="reloadFrames">
+            </form>
+    </div>
+
+    <div class=" mx-auto ">
+
+        {{ error|safe }}
+        <p>10 min video needs about 2 min for processing. Examples: </p>
+        <p>https://www.youtube.com/watch?v=y6gTsj6okHE</p>
+        <p> https://www.youtube.com/watch?v=pzLyzwBdqck</p>
+
+    </div>
+
+{% endblock %}

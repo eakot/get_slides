@@ -5,7 +5,7 @@ __pycache__/
 
 .idea/
 
-static/
+web/static/
 tmp/
 
 data/

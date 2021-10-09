@@ -3,7 +3,7 @@ import subprocess
 from loguru import logger
 
 from src.models.ocr_utils import ocr_image
-from src.shared_models import db
+from src.models.shared import db
 from pathlib import Path
 
 
@@ -26,7 +26,7 @@ class Frame(db.Model):
     def download(self):
         status = subprocess.Popen(self.load_frame_cmd, shell=True)
         status.wait()
-        return status
+        return self.filename
 
     def recognize_text(self):
         self.ocr_text = ocr_image(self.filename)

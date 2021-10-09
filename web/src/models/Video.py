@@ -2,12 +2,27 @@ import datetime
 import json
 from pytube import YouTube
 from timeit import default_timer as timer
-from datetime import datetime
 from src.models.ocr_utils import *
 from src.models.Frame import Frame
-from src.shared_models import db
+from src.models.shared import db
+from datetime import datetime
+from loguru import logger
 
-from src.config import FRAME_RATE_DOWNLOAD
+from src.config import FRAME_RATE_DOWNLOAD, BOOTSTRAP_SERVER, KAFKA_FRAMES_DOWNLOAD_TOPIC
+
+from kafka import KafkaProducer
+
+from pydantic import BaseModel
+from typing import List, Optional
+
+
+class DownloadFramesRequestMessage(BaseModel):
+    video_id: str
+    name = 'DownloadFramesRequestMessage'
+    event_ts: Optional[datetime] = None
+    tags: List[str] = []
+
+
 
 
 class Video(db.Model):
@@ -33,7 +48,7 @@ class Video(db.Model):
     frames_directory = db.Column(db.Text, nullable=False)
     slides_with_text = db.Column(db.Text)
 
-    def __init__(self, frames_directory, video_id):
+    def __init__(self, frames_directory, video_id, producer):
         self.download_datetime = datetime.now()
         self.url = f"https://youtu.be/{video_id}"
         logger.info(f"url = {self.url}")
@@ -45,7 +60,7 @@ class Video(db.Model):
 
         self.caption_tracks = str(self.youtube_object.caption_tracks)
 
-        self.captions_xml_aen = self.youtube_object.captions['a.en'].xml_captions
+        self.captions_xml_aen = ""  # self.youtube_object.captions['a.en'].xml_captions
 
         self.channel_id = self.youtube_object.channel_id
         self.channel_url = self.youtube_object.channel_url
@@ -62,7 +77,7 @@ class Video(db.Model):
 
         frames = self.create_frames()
 
-        self.download_frames_time_sec = Video.download_frames(frames)
+        self.download_frames_time_sec = self.download_frames(frames, producer)
 
         self.ocr_frames_time_sec = Video.ocr_frames(frames)
 
@@ -104,13 +119,21 @@ class Video(db.Model):
         logger.info(f"OCR finished in {ocr_frames_time_sec} sec")
         return ocr_frames_time_sec
 
-    @staticmethod
-    def download_frames(frames):
+    def download_frames(self, frames, producer):
+
         logger.info(f"Download started ")
         download_start_time = timer()
-        [f.download() for f in frames]
+        for f in frames:
+            frame_filename = f.download()
+
+            new_event = DownloadFramesRequestMessage(video_id=self.video_id)
+            new_event.event_ts = datetime.now()
+            data = new_event.json()
+            logger.debug("Message {}".format(data))
+            producer.send(KAFKA_FRAMES_DOWNLOAD_TOPIC, value=data)
+
+
         download_end_time = timer()
         download_frames_time_sec = download_end_time - download_start_time
         logger.info(f"Download finished in {download_frames_time_sec} sec")
         return download_frames_time_sec
-

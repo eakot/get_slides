@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    {{ error|safe }}
+
+    <div class="myForm">
+        <div class="mb-8 ">
+
+            <form method="post">
+                <label for="urlInput" class="form-label">Search slide</label>
+                <input type="text" class="form-control" id="urlInput" name="urlInput">
+                <p></p>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+
+        </div>
+    </div>
+
+
+{% endblock %}
