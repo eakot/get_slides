@@ -12,6 +12,7 @@ from json import dumps
 from src.config import BOOTSTRAP_SERVER
 
 from kafka import KafkaProducer
+
 engine = create_engine('postgresql://postgres:postgres@db:5432/postgres')
 
 app = Flask(__name__, template_folder='../templates/', static_folder='../static')
@@ -25,6 +26,7 @@ producer = KafkaProducer(
     bootstrap_servers=BOOTSTRAP_SERVER,
     value_serializer=lambda x: dumps(x).encode('utf-8')
 )
+
 
 @app.route('/')
 def index():
@@ -67,7 +69,7 @@ def show_slides(video_id):
     video = Video.query.filter_by(video_id=video_id).first()
 
     if video:
-        slides_with_text = json.loads(video.slides_with_text)
+        slides_with_text = {s: "test" for s in video.get_slides()}
         logger.info(f"video found, slides_with_text={slides_with_text}")
         return render_template('dev/show_slides.html',
                                slides_with_text=slides_with_text)

@@ -13,8 +13,6 @@ try:
 except ImportError:
     import Image
 
-from flask_sqlalchemy import SQLAlchemy
-
 
 def clear_text(t: str) -> str:
     regex = re.compile('[^a-zA-Zа-яА-ЯеЁ]')
