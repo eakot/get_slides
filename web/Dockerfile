@@ -2,13 +2,16 @@ FROM python:3.9.7
 WORKDIR /usr/src/app
 
 RUN apt-get update
+RUN apt-get autoclean
+RUN apt-get install ffmpeg libsm6 libxext6  -y
+RUN apt-get install tesseract-ocr -y
 
-COPY ./requirements.txt requirements.txt
-RUN pip3 install -r ./requirements.txt
+COPY requirements.txt .
+RUN --mount=type=cache,target=/root/.cache \
+    pip3 install -r requirements.txt
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV FLASK_APP=src/server
 ENV FLASK_ENV=development
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=80

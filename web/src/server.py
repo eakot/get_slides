@@ -1,17 +1,16 @@
 import pytube
+from turbo_flask import Turbo
 from flask import Flask, url_for, redirect
 from flask import render_template, send_file, request
 from sqlalchemy import create_engine
 from loguru import logger
-import json
-from src.models.shared import db
+from src.models.db_object_shared import db
 from src.models.Video import Video
-from turbo_flask import Turbo
-
-from json import dumps
+import json
 from src.config import BOOTSTRAP_SERVER
-
 from kafka import KafkaProducer
+import time
+import glob
 
 engine = create_engine('postgresql://postgres:postgres@db:5432/postgres')
 
@@ -20,11 +19,16 @@ app.config.from_object("src.config.Config")
 db.init_app(app)
 turbo = Turbo(app)
 
-frames_directory = "static/frames/"
+logger.info(f"static folder: {app.static_folder}")
+logger.info(f"Frames directory: {glob.glob('../static/data/frames/*')}")
 
+
+time.sleep(2)
+logger.info(f"BOOTSTRAP_SERVER = {BOOTSTRAP_SERVER}")
 producer = KafkaProducer(
     bootstrap_servers=BOOTSTRAP_SERVER,
-    value_serializer=lambda x: dumps(x).encode('utf-8')
+    value_serializer=lambda x: json.dumps(x).encode('utf-8'),
+    api_version=(1, 0, 0)
 )
 
 
@@ -51,10 +55,8 @@ def index_upload():
         logger.info(f"Requested video {video_id} already exist in database")
         return redirect(url_for('show_slides', video_id=video_id))
 
-    video = Video(frames_directory, video_id, producer)
+    video = Video(video_id, producer)
 
-    db.session.add(video)
-    db.session.commit()
 
     return redirect(url_for('show_slides', video_id=video_id))
 
@@ -69,8 +71,7 @@ def show_slides(video_id):
     video = Video.query.filter_by(video_id=video_id).first()
 
     if video:
-        slides_with_text = {s: "test" for s in video.get_slides()}
-        logger.info(f"video found, slides_with_text={slides_with_text}")
+        slides_with_text = video.get_slides_with_text()
         return render_template('dev/show_slides.html',
                                slides_with_text=slides_with_text)
     else:

@@ -1,10 +1,9 @@
-import json
-
 import fire
 from kafka import KafkaProducer
-
-from download_request_listener import download_request_listener
+import json
+from ocr_request_listener import ocr_request_listener
 from loguru import logger
+
 from config import BOOTSTRAP_SERVER
 
 
@@ -16,8 +15,7 @@ def run_listeners():
         value_serializer=lambda x: json.dumps(x).encode('utf-8'),
         api_version=(1, 0, 0)
     )
-
-    download_request_listener(producer)
+    ocr_request_listener(producer)
 
 
 if __name__ == '__main__':

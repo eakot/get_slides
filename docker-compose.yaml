@@ -38,6 +38,8 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
     volumes:
       - ./data/kafka:/bitnami/kafka
+    links:
+      - zookeeper:zookeeper
     depends_on:
       - zookeeper
 
@@ -53,19 +55,60 @@ services:
       - PYTHONPATH="${PYTHONPATH}:/usr/src/app"
     volumes:
       - ./downloader:/usr/src/app
+      - ./shared:/usr/src/app/src/shared
       - ./data/frames:/data/frames
+    links:
+      - kafka:kafka
+    depends_on:
+      - db
+      - kafka
+
+  recognizer:
+    build: recognizer
+    environment:
+      - PYTHONPATH="${PYTHONPATH}:/usr/src/app"
+    volumes:
+      - ./recognizer:/usr/src/app
+      - ./shared:/usr/src/app/src/shared
+      - ./data/frames:/data/frames
+    links:
+      - kafka:kafka
     depends_on:
       - db
       - kafka
 
   web:
     build: web
+    environment:
+      - FLASK_APP=src/server
     volumes:
       - ./web:/usr/src/app
-      - ./data/frames:/usr/src/app/static/frames
+      - ./shared:/usr/src/app/src/shared
+      - ./data/frames:/data/frames
+      - ./data/frames:/usr/src/app/static/data/frames
     ports:
       - 80:80
+    links:
+      - kafka:kafka
     depends_on:
       - db
-      - downloader
       - kafka
+      - downloader
+      - recognizer
+
+  web-daemon:
+    build: web
+    environment:
+      - FLASK_APP=listener_daemon/ocr_done_listener
+    volumes:
+      - ./web:/usr/src/app
+      - ./shared:/usr/src/app/src/shared
+      - ./data/frames:/data/frames
+    links:
+      - kafka:kafka
+    depends_on:
+      - db
+      - kafka
+      - downloader
+      - recognizer
+      - web
